@@ -1,25 +1,28 @@
-
+/*******************************************************
+ * File Name:SqList.c  线性表---顺序存储结构
+ * Author:long
+********************************************************/
 #include <stdio.h>
 #include <stdlib.h>
 
-#define TRUE 1
-#define FALSE 0
-#define OK 1
-#define ERROR 0
-#define INIT_SIZE 10        //初始的大小
-#define INCREMENT_SIZE 5    //每次拓展的大小
+#define TRUE    1
+#define FALSE   0
+#define OK      1
+#define ERROR   0
+#define INIT_SIZE       10  //初始的大小
+#define INCREMENT_SIZE  5   //每次拓展的大小
 
 typedef int Status;
-typedef int Elemtype;
+typedef int Elemtype;   //表中存储数据的类型
 
 typedef struct
 {
 	Elemtype *elem;
-	int length;
-	int size;
+	int      length;     //当前长度
+	int      size;       //当前表的最大长度
 }SqList;
 
-Status InitList(SqList *L)
+Status InitList(SqList *L)  //初始化一个表
 {
 	L->elem = (Elemtype *)malloc(INIT_SIZE*sizeof(Elemtype));
 	if (!L->elem)
@@ -27,41 +30,42 @@ Status InitList(SqList *L)
 	    return ERROR;
     }
 	L->length = 0;
-	L->size = INIT_SIZE;
+	L->size   = INIT_SIZE;
 	return OK;
 }
 
-Status DestroyList(SqList *L)
+Status DestroyList(SqList *L)   //销毁一个表
 {
 	free(L->elem);
+    L->elem   = NULL;
 	L->length = 0;
-	L->size = 0;
+	L->size   = 0;
 	return OK;
 }
 
-Status ClearList(SqList *L)
+Status ClearList(SqList *L)     //清空一个表
 {
 	L->length = 0;
 	return OK;
 }
 
-Status IsEmpty(SqList *L)
+Status IsEmpty(const SqList L)       //判断表是否为空
 {
-	if (L->length==0)
+	if (L.length == 0)
 	{
 		return TRUE;
 	}
 	return FALSE;
 }
 
-int getLength(const SqList L)
+int GetLength(const SqList L)   //获得表当前的长度
 {
 	return L.length;
 }
 
-Status GetElem(const SqList L, int i, Elemtype *e)
+Status GetElem(const SqList L, int i, Elemtype *e)  //获取指定位置的元素
 {
-	if (i>0 && i <= L.length)
+	if (i > 0 && i <= L.length)
 	{
 	    *e = L.elem[i-1];
 	    return OK;
@@ -69,13 +73,13 @@ Status GetElem(const SqList L, int i, Elemtype *e)
     return ERROR;
 }
 
-int compare(Elemtype e1, Elemtype e2)
+int Compare(const Elemtype e1, const Elemtype e2)   //比较两个元素的大小
 {
-    if (e1==e2)
+    if (e1 == e2)
     {
         return 0;
     }
-    else if (e1<e2)
+    else if (e1 < e2)
     {
         return -1;
     }
@@ -83,28 +87,28 @@ int compare(Elemtype e1, Elemtype e2)
         return 1;
 }
 
-Status FindElem(const SqList L, Elemtype e, int (*compare)(Elemtype, Elemtype))
+Status FindElem(const SqList L, Elemtype e, int (*Compare)(Elemtype, Elemtype))     //寻找指定元素在表中的位置
 {
     int i;
-    for (i=0; i<L.length; i++)
+    for (i = 0; i < L.length; i++)
     {
-        if (!(*compare)(L.elem[i], e))
+        if (!(*Compare)(L.elem[i], e))
         {
             return i+1;
         }
     }
-    if (i>=L.length)
+    if (i >= L.length)
         return ERROR;
 }
 
-Status InsertElem(SqList *L, int i, Elemtype e)
+Status InsertElem(SqList *L, int i, Elemtype e)     //在指定位置插入指定元素
 {
     Elemtype *new;
-    if (i<1||i>L->length+1)
+    if (i < 1 || i > L->length+1)
     {
         return ERROR;
     }
-    if (L->length>=L->size)
+    if (L->length >= L->size)
     {
         new=(Elemtype *)realloc(L->elem, (L->size + INCREMENT_SIZE)*sizeof(Elemtype));
         if (!new)
@@ -126,9 +130,9 @@ Status InsertElem(SqList *L, int i, Elemtype e)
     return OK;
 }
 
-Status DeleteElem(SqList *L, int i, Elemtype *e)
+Status DeleteElem(SqList *L, int i, Elemtype *e)    //删除指定位置的元素并返回
 {
-    if (i<1||i>L->length)
+    if (i < 1 || i > L->length)
     {
         return ERROR;
     }
@@ -142,34 +146,47 @@ Status DeleteElem(SqList *L, int i, Elemtype *e)
     return OK;
 }
 
-void visit(Elemtype e)
+void Visit(const Elemtype e)      //访问指定元素
 {
-    printf("%d ",e);
+    printf("%d ", e);
 }
 
-Status TraverseList(const SqList L, void (*visit)(Elemtype))
+Status TraverseList(const SqList L, void (*visit)(Elemtype))    //遍历表
 {
     int i;
-    for (i=0;i<L.length;i++)
+    if (L.elem == NULL)
     {
-        visit (L.elem[i]);
+        printf("List is not exist, it could be destroyed.\n");
+        return ERROR;
+    }
+    else if (IsEmpty(L))
+    {
+        printf("List is empty.\n");
+        return OK;
+    }
+    for (i = 0; i  <L.length;i++)
+    {
+        Visit (L.elem[i]);
     }
     return OK;
 }
 
-int main(void)
+int main(void)          //主函数测试
 {
     SqList L;
     if (InitList(&L))
     {
         Elemtype e;
-        printf("Init_success.\n");
+        printf("Initialize success.\n");
         int i;
-        for (i=0; i<10; i++)
+
+        for (i = 0; i < 10; i++)
         {
             InsertElem(&L, i+1, i);
         }
-        printf("Length is %d.\n", getLength(L));
+        printf("List: ");
+        TraverseList(L, Visit);
+        printf("\nLength is %d.\n", GetLength(L));
         if (GetElem(L, 1, &e))
         {
             printf("The first element is %d.\n", e);
@@ -178,7 +195,7 @@ int main(void)
         {
             printf("Element is not exist.\n");
         }
-        if (IsEmpty(&L))
+        if (IsEmpty(L))
         {
             printf("List is empty.\n");
         }
@@ -186,15 +203,18 @@ int main(void)
         {
             printf("List is not empty.\n");
         }
-        printf("The 5 at %d.\n", FindElem(L, 5, *compare));
+        printf("The 1 at %d.\n", FindElem(L, 1, Compare));
         DeleteElem(&L, 1, &e);
         printf("Delete first element is %d.\n", e);
         printf("List: ");
-        TraverseList(L, visit);
+        TraverseList(L, Visit);
+        printf("\nLength is %d.\n", GetLength(L));
         if (DestroyList(&L))
         {
             printf("Destory success.\n");
         }
+        printf("List: ");
+        TraverseList(L, Visit);
     }
     return 0;
 }
